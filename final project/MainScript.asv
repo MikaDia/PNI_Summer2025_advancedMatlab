@@ -125,14 +125,16 @@ end
 % In addition the user should also specify the threshold.
 
 % Write a function that performs tasks 1-7. It takes as inputs: 1. a structure array that contains all the data, 
-% 2. a number between 0 and 1 for the performance threshold. and 3. the task type 
+% 2 a number for the performance threshold. and 3. the task type 
 
-% a. on a separate script, run the function on each behavioral task with threshold 0.60,
+% a. On a separate script, run the function on each behavioral task with threshold 0.60,
 % and plot the weights of each task on the same plot
 
-%b. add an arguments block where you specify the data type of the 3 inputs. For the 3rd input (taskType)
-% add the the validation function mustBeMember(), so that the two behavioral tasks are the only possible options.
-% Now try running the function with a hypothetical task called 'is_auditory'
+%b. add an arguments block together with the validation function mustBeMember(), 
+% so that the two behavioral tasks are the only possible options. In the
+% arguments block also specify the data type for the 1st input (the data
+% structure) and the 2nd input (the threshold). Now try running the function
+% with a hypothetical task called 'is_auditory'
 
 % c. define the towers task as the default, in case the user skips the
 % input whichTask. Call the function with the first two inputs.
