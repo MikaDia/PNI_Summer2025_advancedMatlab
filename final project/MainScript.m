@@ -1,0 +1,140 @@
+%% Mini project summarizing all topics coevered in the SIP Advanced Matlab course 2025.
+
+% created by E. Mika Diamanti on July 30th 2025.
+% contact: emdiamanti@princeton.edu
+
+% load session ms81_M029_2024-09-11_trialStats from the data folder
+% this session contains the behavioral data from 1 session from subject ms81_M029
+% during behavior, the subject alternates in blocks between a behavioral task called
+% 'towers' and an easier behavioral task called 'visually guided'.
+
+%% Task 1: threshold performance (hint: see week 6 lines 100 -140, 175 - 186) 
+% The subject does not perform well in all blocks. You want to exclude blocks when the subject 'phased out'.
+
+% a. first extract the field 'block_performance' from the structure array
+% 'trialStats'. Assign the output to a variable called 'Performance'.
+% blockPerformance is a row vector with columns equal to the total number of
+% trials
+
+
+% b. use a performance threshold of 0.65 (65%) to pull out trials from 'good blocks'. 
+% Assign a 'true' to all elements of blockPerformance that are larger than
+% 0.65. Call the resulting logical array 'goodPerfInd' 
+
+
+%c. use logical indexing, i.e. the goodPerfInd, to extract the 'good trials' in
+%trialStats (note: each row in trialStats corresponds to one trial). 
+
+
+%d. You should now have a trialStats structure array with fewer rows than initially.
+% Double check that the block performance in the resulting structure array
+% is larger than 0.65 across all trials
+
+
+%% Task 2: setting up the data for logistic regression. (hint: see lines 100-138 in week 6)
+% The data come from a navigation behavioral protocol. 
+% As subjects navigate down the stem of a Tmaze, they are presented with visual cues on the side walls of the maze.
+% The position and number of cues on the left or the right side influence the subject's decision to turn left or right at
+% the end of the maze. You want to set up a model that predicts the mouse's decision (choice) from the presented cues. 
+% But first we have to extract the data of interest.
+
+% a.extract the choice: pull out the field 'went_right', and assign it to a
+% variable called Choice (in this vector, 1 -true- means right choice and 0 -false- means
+% left choice)
+
+
+% b. extract the position of the cues from the fields 'cue_pos_left' and 'cue_pos_right'
+% assign them to a variable called Cues_l and Cues_r respectively
+
+
+
+%% Task 3 & 4: Error handling & preallocation (hint: see week 7:lines 116 -134 , 7-9, 55-67) 
+% The nested for loop below groups the visual cues into 5 categories, depending on
+% on their position in the maze (binning). Bin 1 contains all cues that appeared between the 0th and the 39th cm of the maze,
+% Bin 2 between the 40th and 79th and so on.
+
+%a. try running this section. You should run into an error. The problem is that in some trials there may have been no cues presented on a certain side.
+% use the try catch block to catch these trials. Display the warning
+% message that trial xx had no cues presented on the left or on the right.
+
+% b. i. in the code below, preallocate the variables binnedCues_l and
+% binnedCues_r. These are matrices with rows the number of bins and columns
+% the number of trials
+% ii. How long does it take for the loop to run with or without
+% preallocation
+
+Bins = 0:40:200; % in cm
+
+for iTr = 1:numel(Cues_l)
+  
+    whichBins_l = discretize(Cues_l{iTr}, Bins);
+    
+    whichBins_r = discretize(Cues_r{iTr}, Bins);
+    
+   for iB = 1:5
+       binnedCues_l(iB,iTr) = sum(whichBins_l == iB);
+       binnedCues_r(iB,iTr) = sum(whichBins_r == iB);
+   end    
+end
+
+%% Task 5: setting up the feature matrix
+% Our predictors is the difference between cues on the right versus on the
+% left. Create the feature matrix RminusLmat by estimating that difference
+% (see also vectorization week 7: lines 19-54. Matlab is very good with operations on matrices!)
+% All feature matrices used as inputs into MATLAB regression functions,
+% should have number of columns equal to the number of predictors. 
+% Is this the case for RminusLmat (use the function size() to test its dimensions)? 
+% If not, how do you flip this matrix? 
+
+
+
+%% Task 6: filter data even further by behavioral task. (hint: same lines as in Task 2)
+% You want to run the model only on trials from the towers task, so you
+% need is a LOGICAL vector, called TT_ind, with ones (true) corresponding to trials of the
+% towers task. You can get this vector from the field 'is_towers_task' in trialStats.
+% Use this vector to extract the appropriate rows from 'Choice' & 'RminusLmat'  
+
+
+
+
+
+%% Task 7: run logistic regression to predict the choice from binned cues (hint: see Week 9: lines 26 - 39)
+%a. run logistic regression and inspect the model output, Mdl
+
+
+
+%% Task 8: extract the 'weights'/coefficients of the model for each cue category.
+% These can be found in the first column of the table Mdl.Coeeficients.
+% Assign them to a variable called Weights. Include all Weights except from
+% the intercept. Then plot them. Which bin influences the choice the most?
+
+
+
+%% Task 9: wrap all code in Tasks 3 to 7 in a function (hint: see Week 8: lines 100 - 124)
+% in a separate script define the function 'WeightOnDecision'. The function
+% takes as inputs the variables of task 2 (Choice, Cues_l , Cues_r) and the
+% logical vector TT_ind of Task 6 (check all inputs have the same length!!).
+% Repeat tasks 1 and 2 in a separate script and call the
+% function WeightsOnDecision
+
+%% Task 10: Optional inputs into functions (hint: same lines as task 9 plus week 8: lines 50 -64)
+%The function you set up currently, runs only on the towers task trials. 
+% We now want to create a function (WeightsOnDecision2()) in which the user specifies the behavioral task
+% The two types are 'is_towers_task' and 'is_visguided_task' and they are the actual fields in the structure trialStats.
+% In addition the user should also specify the threshold.
+
+% Write a function that performs tasks 1-7. It takes as inputs: 1. a structure array that contains all the data, 
+% 2 a number for the performance threshold. and 3. the task type 
+
+% a. On a separate script, run the function on each behavioral task with threshold 0.60,
+% and plot the weights of each task on the same plot
+
+%b. add an arguments block together with the validation function mustBeMember(), 
+% so that the two behavioral tasks are the only possible options. In the
+% arguments block also specify the data type for the 1st input (the data
+% structure) and the 3rd input (the threshold). Now try running the function
+% with a hypothetical task called 'is_auditory'
+
+% c. define the towers task as the default, in case the user skips the
+% input whichTask. Call the function with the first two inputs.
+
